@@ -153,6 +153,34 @@ class DataRecordForm(tk.Frame):
             input_args={"from_": 0, "to": 1000})
         self.inputs['Blossoms'].grid(row=0, column=1)
 
+        self.inputs['Fruits'] = LabelInput(
+            plantinfo, "Fruits",
+            input_class=tk.Spinbox,
+            input_var=tk.IntVar(),
+            input_args={"from_": 0, "to": 1000})
+        self.inputs['Fruits'].grid(row=0, column=2)
+
+        self.inputs['MinHeight'] = LabelInput(
+            plantinfo, "Min Height (cm)",
+            input_class=tk.Spinbox,
+            input_var=tk.IntVar(),
+            input_args={"from_": 0, "to": 20})
+        self.inputs['MinHeight'].grid(row=1, column=0)
+
+        self.inputs['MaxHeight'] = LabelInput(
+            plantinfo, "Max Height (cm)",
+            input_class=tk.Spinbox,
+            input_var=tk.IntVar(),
+            input_args={"from_": 0, "to": 1000})
+        self.inputs['MaxHeight'].grid(row=1, column=1)
+
+        self.inputs['MedHeight'] = LabelInput(
+            plantinfo, "Median Height (cm)",
+            input_class=tk.Spinbox,
+            input_var=tk.IntVar(),
+            input_args={"from_": 0, "to": 1000})
+        self.inputs['MedHeight'].grid(row=1, column=2)
+
         plantinfo.grid(row=2, column=0, sticky=tk.W + tk.E)
 
         # Notes section
