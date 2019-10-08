@@ -192,17 +192,17 @@ class DataRecordForm(tk.Frame):
         self.inputs['Notes'].grid(sticky="w", row=3, column=0)
 
 
-def get(self):
-    data = {}
-    for key, widget in self.inputs.items():
-        data[key] = widget.get()
-    return data
+	def get(self):
+		data = {}
+		for key, widget in self.inputs.items():
+			data[key] = widget.get()
+		return data
 
 
-def reset(self):
-    for widget in self.inputs.values():
-        widget.set('')
-    self.reset()
+	def reset(self):
+		for widget in self.inputs.values():
+			widget.set('')
+		self.reset()
 
 
 class Application(tk.Tk):
