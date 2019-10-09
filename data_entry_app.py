@@ -191,16 +191,16 @@ class DataRecordForm(tk.Frame):
 		)
 		self.inputs['Notes'].grid(sticky="w", row=3, column=0)
 
-		def get(self):
-			data = {}
-			for key, widget in self.inputs.items():
-				data[key] = widget.get()
-			return data
+	def get(self):
+		data = {}
+		for key, widget in self.inputs.items():
+			data[key] = widget.get()
+		return data
 
-		def reset(self):
-			for widget in self.inputs.values():
-				widget.set('')
-			self.reset()
+	def reset(self):
+		for widget in self.inputs.values():
+			widget.set('')
+		self.reset()
 
 
 class Application(tk.Tk):
@@ -229,6 +229,8 @@ class Application(tk.Tk):
 		self.statusbar = ttk.Label(self, textvariable=self.status)
 		self.statusbar.grid(sticky=(tk.W + tk.E), row=3, padx=10)
 
+		self.records_saved = 0
+
 	def on_save(self):
 		datestring = datetime.today().strftime("%Y-%m-%d")
 		filename = "abq_data_record_{}.csv".format(datestring)
@@ -241,7 +243,12 @@ class Application(tk.Tk):
 			if newfile:
 				csvwriter.writeheader()
 			csvwriter.writerow(data)
+		# self.recordform.reset()
 
+		self.records_saved += 1
+		self.status.set(
+			"{} records saved this session".format(self.records_saved)
+		)
 
 if __name__ == "__main__":
 	app = Application()
