@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from .constants import FieldTypes as FT
 
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
@@ -7,23 +8,49 @@ from decimal import Decimal, InvalidOperation
 
 class LabelInput(tk.Frame):
 	"""A widget containing a label and input together."""
-
+	field_types = {
+		FT.string: (RequiredEntry, tk.StringVar),
+		FT.string_list: (ValidatedCombobox, tk.StringVar),
+		FT.iso_date_string: (DateEntry, tk.StringVar),
+		FT.long_string: (tk.Text, lambda: None),
+		FT.decimal: (ValidatedSpinbox, tk.DoubleVar),
+		FT.integer: (ValidatedSpinbox, tk.IntVar),
+		FT.boolean: (ttk.Checkbutton, tk.BooleanVar)
+	}
 	def __init__(self, parent, label='', input_class=ttk.Entry,
 			input_var=None, input_args=None, label_args=None,
-			**kwargs):
+			field_spec=None, **kwargs):
 		super().__init__(parent, **kwargs)
 		input_args = input_args or {}
 		label_args = label_args or {}
-		self.variable = input_var
+
+		if field_spec:
+			field_type = field_spec.get('type', FT.string)
+			input_class = input_class or
+			self.field_types.get(field_type)[0]
+			var_type = self.field_types.get(field_type)[1]
+			self.variable = input_var if input_var else var_type()
+			# min, max, increment
+			if 'min' in field_spec and 'from_' not in input_args:
+				input_args['from_'] = field_spec.get('min')
+			if 'max' in field_spec and 'to' not in input_args:
+				input_args['to'] = field_spec.get('max')
+			if 'inc' in field_spec and 'increment' not in input_args:
+				input_args['increment'] = field_spec.get('inc')
+			# values
+			if 'values' in field_spec and 'values' not in input_args:
+				input_args['values'] = field_spec.get('values')
+		else:
+			self.variable = input_var
 
 		if input_class in (ttk.Checkbutton, ttk.Button,
 		ttk.Radiobutton):
 			input_args["text"] = label
-			input_args["variable"] = input_var
+			input_args["variable"] = self.variable
 		else:
 			self.label = ttk.Label(self, text=label, **label_args)
 			self.label.grid(row=0, column=0, sticky=(tk.W + tk.E))
-			input_args["textvariable"] = input_var
+			input_args["textvariable"] = self.variable
 
 		self.input = input_class(self, **input_args)
 		self.input.grid(row=1, column=0, sticky=(tk.W + tk.E))
