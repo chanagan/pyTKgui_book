@@ -35,6 +35,10 @@ class LabelInput(tk.Frame):
 
 		self.columnconfigure(0, weight=1)
 
+		self.error = getattr(self.input, 'error', tk.StringVar())
+		self.error_label = ttk.Label(self, textvariable=self.error)
+		self.error_label.grid(row=2, column=0, sticky=(tk.W + tk.E))
+
 	def grid(self, sticky=(tk.E + tk.W), **kwargs):
 		super().grid(sticky=sticky, **kwargs)
 
@@ -81,28 +85,30 @@ class DataRecordForm(tk.Frame):
 		recordinfo = tk.LabelFrame(self, text="Record Information")
 
 		self.inputs['Date'] = LabelInput(recordinfo, "Date",
+			input_class=DateEntry,
 			input_var=tk.StringVar())
 		self.inputs['Date'].grid(row=0, column=0)
 
 		self.inputs['Time'] = LabelInput(recordinfo, "Time",
-			input_class=ttk.Combobox, input_var=tk.StringVar(),
+			input_class=ValidatedCombobox,
+			input_var=tk.StringVar(),
 			input_args={"values": ["8:00", "12:00", "16:00", "20:00"]})
 		self.inputs['Time'].grid(row=0, column=1)
 
-		self.inputs['Technician'] = LabelInput(recordinfo,
-			"Technician",
+		self.inputs['Technician'] = LabelInput(recordinfo, "Technician",
+			input_class=RequiredEntry,
 			input_var=tk.StringVar())
 		self.inputs['Technician'].grid(row=0, column=2)
 
 		# line 2
 		self.inputs['Lab'] = LabelInput(recordinfo, "Lab",
-			input_class=ttk.Combobox, input_var=tk.StringVar(),
+			input_class=ValidatedCombobox, input_var=tk.StringVar(),
 			input_args={"values": ["A", "B", "C", "D", "E"]})
 		self.inputs['Lab'].grid(row=1, column=0)
 
 		self.inputs['Plot'] = LabelInput(recordinfo, "Plot",
-			input_class=ttk.Combobox, input_var=tk.IntVar(),
-			input_args={"values": list(range(1, 21))})
+			input_class=ValidatedCombobox, input_var=tk.StringVar(),
+			input_args={"values": [str(x) for x in range(1, 21)]})
 		self.inputs['Plot'].grid(row=1, column=1)
 
 		self.inputs['Seed sample'] = LabelInput(
@@ -115,20 +121,21 @@ class DataRecordForm(tk.Frame):
 		environmentinfo = tk.LabelFrame(self, text="Environment Data")
 		self.inputs['Humidity'] = LabelInput(
 			environmentinfo, "Humidity (g/m³)",
-			input_class=tk.Spinbox, input_var=tk.DoubleVar(),
-			input_args={"from_": 0.5, "to": 52.0, "increment": .01})
+			input_class=ValidatedSpinbox,
+			input_var=tk.DoubleVar(),
+			input_args={"from_": '0.5', "to": '52.0', "increment": '.01'})
 		self.inputs['Humidity'].grid(row=0, column=0)
 
 		self.inputs['Light'] = LabelInput(
 			environmentinfo, "Light level (klx)",
-			input_class=tk.Spinbox, input_var=tk.DoubleVar(),
-			input_args={"from_": 0, "to": 100, "increment": 1})
+			input_class=ValidatedSpinbox, input_var=tk.DoubleVar(),
+			input_args={"from_": '0', "to": '100', "increment": '1'})
 		self.inputs['Light'].grid(row=0, column=1)
 
 		self.inputs['Temperature'] = LabelInput(
 			environmentinfo, "Temp (°C)",
-			input_class=tk.Spinbox, input_var=tk.DoubleVar(),
-			input_args={"from_": 4, "to": 40, "increment": 1})
+			input_class=ValidatedSpinbox, input_var=tk.DoubleVar(),
+			input_args={"from_": '4', "to": '40', "increment": '1'})
 		self.inputs['Temperature'].grid(row=0, column=2)
 
 		self.inputs['Equipment Fault'] = LabelInput(
@@ -143,44 +150,52 @@ class DataRecordForm(tk.Frame):
 
 		self.inputs['Plants'] = LabelInput(
 			plantinfo, "Plants",
-			input_class=tk.Spinbox,
+			input_class=ValidatedSpinbox,
 			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 20})
+			input_args={"from_": '0', "to": '20'})
 		self.inputs['Plants'].grid(row=0, column=0)
 
 		self.inputs['Blossoms'] = LabelInput(
 			plantinfo, "Blossoms",
-			input_class=tk.Spinbox,
+			input_class=ValidatedSpinbox,
 			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 1000})
+			input_args={"from_": '0', "to": '1000'})
 		self.inputs['Blossoms'].grid(row=0, column=1)
 
 		self.inputs['Fruits'] = LabelInput(
 			plantinfo, "Fruits",
-			input_class=tk.Spinbox,
+			input_class=ValidatedSpinbox,
 			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 1000})
+			input_args={"from_": '0', "to": '1000'})
 		self.inputs['Fruits'].grid(row=0, column=2)
+
+		min_height_var = tk.DoubleVar(value='-infinity')
+		max_height_var = tk.DoubleVar(value='infinity')
 
 		self.inputs['MinHeight'] = LabelInput(
 			plantinfo, "Min Height (cm)",
-			input_class=tk.Spinbox,
-			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 20})
+			input_class=ValidatedSpinbox,
+			input_var=tk.DoubleVar(),
+			input_args={
+				"from_"           : '0', "to": '20', "increment": '.01',
+				"max_var"         : max_height_var,
+				"focus_update_var": min_height_var})
 		self.inputs['MinHeight'].grid(row=1, column=0)
 
 		self.inputs['MaxHeight'] = LabelInput(
 			plantinfo, "Max Height (cm)",
-			input_class=tk.Spinbox,
-			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 1000})
+			input_class=ValidatedSpinbox,
+			input_var=tk.DoubleVar(),
+			input_args={"from_": '0', "to": '1000',
+			"min_var": min_height_var, "focus_update_var": max_height_var})
 		self.inputs['MaxHeight'].grid(row=1, column=1)
 
 		self.inputs['MedHeight'] = LabelInput(
 			plantinfo, "Median Height (cm)",
-			input_class=tk.Spinbox,
-			input_var=tk.IntVar(),
-			input_args={"from_": 0, "to": 1000})
+			input_class=ValidatedSpinbox,
+			input_var=tk.DoubleVar(),
+			input_args={"from_": '0', "to": '1000',
+			"min_var": min_height_var, "max_var": max_height_var})
 		self.inputs['MedHeight'].grid(row=1, column=2)
 
 		plantinfo.grid(row=2, column=0, sticky=tk.W + tk.E)
@@ -204,6 +219,17 @@ class DataRecordForm(tk.Frame):
 			widget.set('')
 		self.reset()
 
+	def get_erors(self):
+		"""Get a list of field errors in theform"""
+
+		errors = {}
+		for key, widget in self.inputs.items():
+			if hasattr(widget.input, 'trigger_focusout_validation'):
+				widget.input.trigger_focusout_validation()
+			if widget.error.get():
+				errors[key] = widget.error.get()
+
+		return errors
 
 class ValidatedMixin:
 	"""Adds a validation functionality"""
@@ -224,8 +250,7 @@ class ValidatedMixin:
 	def _toggle_error(self, on=False):
 		self.config(foreground=('red' if on else 'black'))
 
-	def _validate(self, proposed, current, char, event, index,
-			action):
+	def _validate(self, proposed, current, char, event, index, action):
 		self._toggle_error(False)
 		self.error.set('')
 		valid = True
@@ -242,6 +267,20 @@ class ValidatedMixin:
 
 	def _key_validate(self, **kwargs):
 		return True
+
+	def _invalid(self, proposed, current, char, event, index, action):
+		if event == 'focusout':
+			self._focusout_invalid(event=event)
+		elif event == 'key':
+			self._key_invalid(proposed=proposed,
+				current=current, char=char, event=event,
+				index=index, action=action)
+
+	def _focusout_invalid(self, **kwargs):
+		self._toggle_error(True)
+
+	def _key_invalid(self, **kwargs):
+		pass
 
 	def trigger_focusout_validation(self):
 		valid = self._validate('', '', '', 'focusout', '', '')
@@ -381,6 +420,19 @@ class ValidatedSpinbox(ValidatedMixin, tk.Spinbox):
 			self.variable.set(current)
 		self.trigger_focusout_validation()
 
+	def _set_maximum(self, *args):
+		current = self.get()
+		try:
+			new_max = self.max_var.get()
+			self.config(from_=new_max)
+		except (tk.TclError, ValueError):
+			pass
+		if not current:
+			self.delete(0, tk.END)
+		else:
+			self.variable.set(current)
+		self.trigger_focusout_validation()
+
 	def _key_validate(self, char, index, current,
 			proposed, action, **kwargs):
 		valid = True
@@ -464,7 +516,6 @@ class ValidatedCombobox(ValidatedMixin, ttk.Combobox):
 			valid = False
 		return valid
 
-
 	def _focusout_validate(self, **kwargs):
 		valid = True
 		if not self.get():
@@ -500,6 +551,16 @@ class Application(tk.Tk):
 		self.statusbar.grid(sticky=(tk.W + tk.E), row=3, padx=10)
 
 	def on_save(self):
+		# check for errors first
+
+		errors = self.recordform.get_erors()
+		if errors:
+			self.status.set(
+				"Cannot save, error in fields: {}"
+				.format(', '.join(errors.keys()))
+			)
+			return False
+
 		datestring = datetime.today().strftime("%Y-%m-%d")
 		filename = "abq_data_record_{}.csv".format(datestring)
 		newfile = not os.path.exists(filename)
