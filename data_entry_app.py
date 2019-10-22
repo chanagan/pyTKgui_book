@@ -219,17 +219,18 @@ class DataRecordForm(tk.Frame):
 			widget.set('')
 		self.reset()
 
-	def get_erors(self):
+	def get_errors(self):
 		"""Get a list of field errors in theform"""
 
 		errors = {}
 		for key, widget in self.inputs.items():
-			if hasattr(widget.input, 'trigger_focusout_validation'):
-				widget.input.trigger_focusout_validation()
+			# if hasattr(widget.input, 'trigger_focusout_validation'):
+			# 	widget.input.trigger_focusout_validation()
 			if widget.error.get():
 				errors[key] = widget.error.get()
 
 		return errors
+
 
 class ValidatedMixin:
 	"""Adds a validation functionality"""
@@ -553,13 +554,13 @@ class Application(tk.Tk):
 	def on_save(self):
 		# check for errors first
 
-		errors = self.recordform.get_erors()
-		if errors:
-			self.status.set(
-				"Cannot save, error in fields: {}"
-				.format(', '.join(errors.keys()))
-			)
-			return False
+		errors = self.recordform.get_errors()
+		# if errors:
+		# 	self.status.set(
+		# 		"Cannot save, error in fields: {}"
+		# 		.format(', '.join(errors.keys()))
+		# 	)
+		# 	return False
 
 		datestring = datetime.today().strftime("%Y-%m-%d")
 		filename = "abq_data_record_{}.csv".format(datestring)
