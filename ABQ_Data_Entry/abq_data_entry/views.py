@@ -7,7 +7,7 @@ from . import widgets as w
 class DataRecordForm(tk.Frame):
 	"""The input form for our widgets"""
 
-	def __init__(self, parent, *args, **kwargs):
+	def __init__(self, parent, fields, *args, **kwargs):
 		super().__init__(parent, *args, **kwargs)
 
 		# A dict to keep track of input widgets
@@ -15,36 +15,41 @@ class DataRecordForm(tk.Frame):
 
 		recordinfo = tk.LabelFrame(self, text="Record Information")
 
-		self.inputs['Date'] = w.LabelInput(recordinfo, "Date",
-			input_class=w.DateEntry,
-			input_var=tk.StringVar()
+		self.inputs['Date'] = w.LabelInput(
+			recordinfo, "Date",
+			field_spec=fields['Date']
 		)
 		self.inputs['Date'].grid(row=0, column=0)
 
-		self.inputs['Time'] = w.LabelInput(recordinfo, "Time",
-			input_class=ttk.Combobox,
-			input_var=tk.StringVar(),
-			input_args={"values": ["8:00", "12:00", "16:00", "20:00"]})
+		self.inputs['Time'] = w.LabelInput(
+			recordinfo, "Time",
+			field_spec=fields['Time']
+		)
 		self.inputs['Time'].grid(row=0, column=1)
 
-		self.inputs['Technician'] = w.LabelInput(recordinfo,
-			"Technician",
-			input_var=tk.StringVar())
+		self.inputs['Technician'] = w.LabelInput(
+			recordinfo, "Technician",
+			field_spec=fields['Technician']
+		)
 		self.inputs['Technician'].grid(row=0, column=2)
 
 		# line 2
-		self.inputs['Lab'] = w.LabelInput(recordinfo, "Lab",
-			input_class=ttk.Combobox, input_var=tk.StringVar(),
-			input_args={"values": ["A", "B", "C", "D", "E"]})
+		self.inputs['Lab'] = w.LabelInput(
+			recordinfo, "Lab",
+			field_spec=fields['Lab']
+		)
 		self.inputs['Lab'].grid(row=1, column=0)
 
-		self.inputs['Plot'] = w.LabelInput(recordinfo, "Plot",
-			input_class=ttk.Combobox, input_var=tk.IntVar(),
-			input_args={"values": list(range(1, 21))})
+		self.inputs['Plot'] = w.LabelInput(
+			recordinfo, "Plot",
+			field_spec=fields['Plot']
+		)
 		self.inputs['Plot'].grid(row=1, column=1)
 
 		self.inputs['Seed sample'] = w.LabelInput(
-			recordinfo, "Seed sample", input_var=tk.StringVar())
+			recordinfo, "Seed sample",
+			field_spec=fields['Seed sample']
+		)
 		self.inputs['Seed sample'].grid(row=1, column=2)
 
 		recordinfo.grid(row=0, column=0, sticky=tk.W + tk.E)
